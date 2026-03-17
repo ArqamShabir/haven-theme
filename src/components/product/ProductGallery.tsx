@@ -110,21 +110,6 @@ const ProductGallery = ({ images, title }: ProductGalleryProps) => {
         </div>
       )}
 
-      {/* Scrollable vertical gallery for mobile */}
-      <div className="md:hidden space-y-2 mt-4">
-        {gallery.slice(1).map((img, i) => (
-          <motion.div
-            key={i}
-            className="bg-muted overflow-hidden"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.5 }}
-          >
-            <img src={img.url} alt={img.alt} className="w-full object-cover" loading="lazy" />
-          </motion.div>
-        ))}
-      </div>
     </div>
   );
 };
