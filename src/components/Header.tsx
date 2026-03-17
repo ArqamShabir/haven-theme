@@ -19,8 +19,8 @@ const Header = () => {
 
   const navLinks = [
     { label: 'Shop', href: '/collections' },
-    { label: 'Collections', href: '/collections' },
-    { label: 'About', href: '/' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
   ];
 
   return (
@@ -31,7 +31,6 @@ const Header = () => {
         }`}
       >
         <div className="container-main w-full flex items-center justify-between">
-          {/* Left: Nav */}
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map(link => (
               <Link
@@ -44,7 +43,6 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 -ml-2"
@@ -53,12 +51,10 @@ const Header = () => {
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          {/* Center: Logo */}
           <Link to="/" className="absolute left-1/2 -translate-x-1/2">
             <h1 className="font-serif text-2xl tracking-tight">Haven</h1>
           </Link>
 
-          {/* Right: Icons */}
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSearchOpen(true)}
@@ -67,7 +63,7 @@ const Header = () => {
             >
               <Search className="w-5 h-5" />
             </button>
-            <Link to="/" className="p-2 hover:opacity-70 transition-opacity duration-150 hidden md:block" aria-label="Account">
+            <Link to="/about" className="p-2 hover:opacity-70 transition-opacity duration-150 hidden md:block" aria-label="Account">
               <User className="w-5 h-5" />
             </Link>
             <CartDrawer />
@@ -75,7 +71,6 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Mobile menu */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 top-[116px] z-40 bg-background">
           <nav className="container-main py-8 flex flex-col gap-6">
