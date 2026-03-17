@@ -1,10 +1,12 @@
 import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
+import SocialProofBar from '@/components/SocialProofBar';
 import FeaturedCollection from '@/components/FeaturedCollection';
 import ImageWithText from '@/components/ImageWithText';
 import Benefits from '@/components/Benefits';
-import Testimonials from '@/components/Testimonials';
+import UrgencyBanner from '@/components/UrgencyBanner';
+import ReviewsSummary from '@/components/ReviewsSummary';
 import FAQ from '@/components/FAQ';
 import Newsletter from '@/components/Newsletter';
 import Footer from '@/components/Footer';
@@ -16,10 +18,12 @@ const Index = () => {
       <Header />
       <main>
         <Hero />
+        <SocialProofBar />
         <FeaturedCollection />
         <ImageWithText />
         <Benefits />
-        <Testimonials />
+        <UrgencyBanner />
+        <ReviewsSummary />
         <FAQ />
         <Newsletter />
       </main>

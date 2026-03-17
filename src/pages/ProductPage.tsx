@@ -14,6 +14,8 @@ import LifestyleSection from '@/components/product/LifestyleSection';
 import ProductFAQ from '@/components/product/ProductFAQ';
 import FeaturedCollection from '@/components/FeaturedCollection';
 import StickyATC from '@/components/product/StickyATC';
+import ReviewsSummary from '@/components/ReviewsSummary';
+import SocialProofBar from '@/components/SocialProofBar';
 
 const ProductPage = () => {
   const { handle } = useParams<{ handle: string }>();
@@ -89,7 +91,6 @@ const ProductPage = () => {
       <Header />
 
       <main>
-        {/* Hero product section */}
         <section className="container-main py-8 md:py-12">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
             <div className="md:col-span-7">
@@ -106,12 +107,13 @@ const ProductPage = () => {
           </div>
         </section>
 
+        <SocialProofBar />
         <ProductHighlights />
         <ProductTabs description={product.description} />
         <LifestyleSection />
+        <ReviewsSummary />
         <ProductFAQ />
 
-        {/* Related products */}
         <FeaturedCollection />
       </main>
 

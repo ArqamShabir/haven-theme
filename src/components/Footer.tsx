@@ -5,7 +5,6 @@ const Footer = () => {
     <footer className="border-t border-border">
       <div className="container-main section-padding">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-6">
-          {/* Brand */}
           <div className="md:col-span-1">
             <h3 className="font-serif text-xl mb-4">Haven</h3>
             <p className="text-sm text-muted-foreground">
@@ -13,7 +12,6 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Shop */}
           <div>
             <h4 className="caps-label text-foreground mb-4">Shop</h4>
             <ul className="space-y-2">
@@ -23,23 +21,21 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Info */}
           <div>
             <h4 className="caps-label text-foreground mb-4">Information</h4>
             <ul className="space-y-2">
-              <li><Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">About</Link></li>
-              <li><Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Shipping & Returns</Link></li>
-              <li><Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contact</Link></li>
+              <li><Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">About</Link></li>
+              <li><Link to="/shipping" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Shipping & Returns</Link></li>
+              <li><Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contact</Link></li>
             </ul>
           </div>
 
-          {/* Policies */}
           <div>
             <h4 className="caps-label text-foreground mb-4">Policies</h4>
             <ul className="space-y-2">
-              <li><Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Terms of Service</Link></li>
-              <li><Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Refund Policy</Link></li>
+              <li><Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/refund" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Refund Policy</Link></li>
+              <li><Link to="/shipping" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Shipping Policy</Link></li>
             </ul>
           </div>
         </div>
