@@ -1,13 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Clock } from 'lucide-react';
 import { toast } from 'sonner';
+import { useProductStore } from '@/stores/productStore';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 const ContactPage = () => {
+  const [searchParams] = useSearchParams();
+  const productHandle = searchParams.get('product');
+  const getProduct = useProductStore(s => s.getProduct);
+  const contactEmail = useSettingsStore(s => s.contactEmail);
+  const studioAddress = useSettingsStore(s => s.studioAddress);
+
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+
+  useEffect(() => {
+    if (productHandle) {
+      const product = getProduct(productHandle);
+      if (product) {
+        setForm(f => ({
+          ...f,
+          subject: `Enquiry about: ${product.title}`,
+          message: `Hi, I'm interested in purchasing the ${product.title} ($${parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2)}). Please let me know about availability and next steps.`,
+        }));
+      }
+    }
+  }, [productHandle, getProduct]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,8 +75,8 @@ const ContactPage = () => {
 
             <div className="md:col-span-2 space-y-8">
               {[
-                { icon: Mail, title: 'Email', lines: ['hello@haven-home.com', 'We reply within 24 hours'] },
-                { icon: MapPin, title: 'Studio', lines: ['123 Artisan Lane', 'Portland, OR 97201'] },
+                { icon: Mail, title: 'Email', lines: [contactEmail, 'We reply within 24 hours'] },
+                { icon: MapPin, title: 'Studio', lines: studioAddress.split(',').map(s => s.trim()) },
                 { icon: Clock, title: 'Hours', lines: ['Mon – Fri: 9am – 6pm PST', 'Sat – Sun: Closed'] },
               ].map(info => (
                 <div key={info.title} className="flex gap-4">

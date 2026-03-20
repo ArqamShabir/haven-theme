@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, X, Loader2 } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { fetchProducts, ShopifyProduct } from '@/lib/shopify';
+import { useProductStore } from '@/stores/productStore';
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface SearchOverlayProps {
@@ -11,8 +11,7 @@ interface SearchOverlayProps {
 
 const SearchOverlay = ({ open, onClose }: SearchOverlayProps) => {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<ShopifyProduct[]>([]);
-  const [loading, setLoading] = useState(false);
+  const getProducts = useProductStore(s => s.getProducts);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -20,24 +19,12 @@ const SearchOverlay = ({ open, onClose }: SearchOverlayProps) => {
       setTimeout(() => inputRef.current?.focus(), 100);
     } else {
       setQuery('');
-      setResults([]);
     }
   }, [open]);
 
-  useEffect(() => {
-    if (!query.trim()) { setResults([]); return; }
-    const timer = setTimeout(async () => {
-      setLoading(true);
-      try {
-        const products = await fetchProducts(10, `title:${query}*`);
-        setResults(products);
-      } catch { setResults([]); }
-      setLoading(false);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [query]);
-
   if (!open) return null;
+
+  const results = query.trim() ? getProducts(10, query) : [];
 
   return (
     <AnimatePresence>
@@ -64,11 +51,7 @@ const SearchOverlay = ({ open, onClose }: SearchOverlayProps) => {
           </div>
 
           <div className="mt-8">
-            {loading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-              </div>
-            ) : results.length > 0 ? (
+            {results.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {results.map(product => (
                   <Link

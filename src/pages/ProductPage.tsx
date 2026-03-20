@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useProduct } from '@/hooks/useProducts';
-import { useCartStore } from '@/stores/cartStore';
 import { Loader2 } from 'lucide-react';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
@@ -20,7 +19,6 @@ import SocialProofBar from '@/components/SocialProofBar';
 const ProductPage = () => {
   const { handle } = useParams<{ handle: string }>();
   const { data: product, isLoading } = useProduct(handle || '');
-  const addItem = useCartStore(s => s.addItem);
 
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [stickyVisible, setStickyVisible] = useState(false);
@@ -71,18 +69,6 @@ const ProductPage = () => {
     )
   )?.node || product.variants.edges[0]?.node;
 
-  const handleAddToCart = async () => {
-    if (!selectedVariant) return;
-    await addItem({
-      product: { node: product },
-      variantId: selectedVariant.id,
-      variantTitle: selectedVariant.title,
-      price: selectedVariant.price,
-      quantity: 1,
-      selectedOptions: selectedVariant.selectedOptions || [],
-    });
-  };
-
   const firstImage = product.images.edges[0]?.node?.url;
 
   return (
@@ -121,7 +107,6 @@ const ProductPage = () => {
         visible={stickyVisible}
         product={product}
         selectedVariant={selectedVariant}
-        onAddToCart={handleAddToCart}
         imageUrl={firstImage}
       />
 

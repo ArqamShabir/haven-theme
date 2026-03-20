@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ShopifyProduct } from '@/lib/shopify';
-import { useCartStore } from '@/stores/cartStore';
+import { ShopifyProduct } from '@/stores/productStore';
 import { motion } from 'framer-motion';
 
 interface ProductCardProps {
@@ -9,27 +8,10 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
-  const addItem = useCartStore(s => s.addItem);
-  const isLoading = useCartStore(s => s.isLoading);
   const { node } = product;
-  const firstVariant = node.variants.edges[0]?.node;
   const firstImage = node.images.edges[0]?.node;
   const secondImage = node.images.edges[1]?.node;
   const price = node.priceRange.minVariantPrice;
-
-  const handleQuickAdd = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!firstVariant) return;
-    await addItem({
-      product,
-      variantId: firstVariant.id,
-      variantTitle: firstVariant.title,
-      price: firstVariant.price,
-      quantity: 1,
-      selectedOptions: firstVariant.selectedOptions || [],
-    });
-  };
 
   return (
     <motion.div
@@ -61,15 +43,9 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
             </div>
           )}
 
-          {/* Quick add */}
+          {/* View details on hover */}
           <div className="absolute bottom-0 left-0 right-0 h-12 bg-background/90 backdrop-blur-sm flex items-center justify-center translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-            <button
-              onClick={handleQuickAdd}
-              disabled={isLoading || !firstVariant}
-              className="caps-label text-[11px] text-foreground hover:opacity-70 transition-opacity"
-            >
-              {isLoading ? 'Adding...' : 'Quick add'}
-            </button>
+            <span className="caps-label text-[11px] text-foreground">View details</span>
           </div>
         </div>
         <div className="mt-3">
