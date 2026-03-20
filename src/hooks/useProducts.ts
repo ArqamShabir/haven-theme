@@ -1,17 +1,15 @@
-import { useQuery } from '@tanstack/react-query';
-import { fetchProducts, fetchProductByHandle } from '@/lib/shopify';
+import { useProductStore, Product, ShopifyProduct } from '@/stores/productStore';
 
 export function useProducts(count: number = 20, query?: string) {
-  return useQuery({
-    queryKey: ['products', count, query],
-    queryFn: () => fetchProducts(count, query),
-  });
+  const getProducts = useProductStore(s => s.getProducts);
+  const products = getProducts(count, query);
+  return { data: products, isLoading: false };
 }
 
 export function useProduct(handle: string) {
-  return useQuery({
-    queryKey: ['product', handle],
-    queryFn: () => fetchProductByHandle(handle),
-    enabled: !!handle,
-  });
+  const getProduct = useProductStore(s => s.getProduct);
+  const product = handle ? getProduct(handle) : undefined;
+  return { data: product || null, isLoading: false };
 }
+
+export type { Product, ShopifyProduct };
