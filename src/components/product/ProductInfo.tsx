@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { Loader2, Truck, RotateCcw, Shield, CreditCard, Star } from 'lucide-react';
-import { useCartStore } from '@/stores/cartStore';
+import { Truck, RotateCcw, Shield, Mail } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 interface ProductInfoProps {
@@ -11,24 +10,7 @@ interface ProductInfoProps {
 }
 
 const ProductInfo = ({ product, selectedOptions, setSelectedOptions, selectedVariant }: ProductInfoProps) => {
-  const [quantity, setQuantity] = useState(1);
-  const addItem = useCartStore(s => s.addItem);
-  const cartLoading = useCartStore(s => s.isLoading);
-
-  const handleAddToCart = async () => {
-    if (!selectedVariant) return;
-    await addItem({
-      product: { node: product },
-      variantId: selectedVariant.id,
-      variantTitle: selectedVariant.title,
-      price: selectedVariant.price,
-      quantity,
-      selectedOptions: selectedVariant.selectedOptions || [],
-    });
-  };
-
   const price = parseFloat(selectedVariant?.price.amount || '0');
-  const comparePrice = price * 1.0; // No compare-at for now
 
   return (
     <div className="md:sticky md:top-24 space-y-6">
@@ -53,7 +35,6 @@ const ProductInfo = ({ product, selectedOptions, setSelectedOptions, selectedVar
             ${price.toFixed(2)}
           </span>
         </div>
-        <p className="text-xs text-muted-foreground mt-1">Tax included. Shipping calculated at checkout.</p>
       </div>
 
       <div className="w-full h-px bg-border" />
@@ -85,55 +66,17 @@ const ProductInfo = ({ product, selectedOptions, setSelectedOptions, selectedVar
           </div>
         ))}
 
-      {/* Quantity */}
-      <div>
-        <p className="caps-label text-foreground mb-3">Quantity</p>
-        <div className="flex items-center border border-border w-fit" style={{ borderRadius: 'var(--radius)' }}>
-          <button
-            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            className="w-12 h-12 flex items-center justify-center hover:bg-muted transition-colors text-foreground"
-          >
-            −
-          </button>
-          <span className="w-12 h-12 flex items-center justify-center text-sm font-medium text-foreground border-x border-border">
-            {quantity}
-          </span>
-          <button
-            onClick={() => setQuantity(quantity + 1)}
-            className="w-12 h-12 flex items-center justify-center hover:bg-muted transition-colors text-foreground"
-          >
-            +
-          </button>
-        </div>
-      </div>
-
-      {/* Add to Cart */}
+      {/* Contact to Buy */}
       <div className="space-y-3">
-        <motion.button
-          onClick={handleAddToCart}
-          disabled={cartLoading || !selectedVariant?.availableForSale}
-          className="btn-primary w-full h-14 text-[12px] disabled:opacity-50"
-          whileTap={{ scale: 0.98 }}
-        >
-          {cartLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : !selectedVariant?.availableForSale ? (
-            'Sold out'
-          ) : (
-            `Add to cart — $${(price * quantity).toFixed(2)}`
-          )}
-        </motion.button>
-
-        {/* Express checkout */}
-        <button
-          onClick={handleAddToCart}
-          disabled={cartLoading}
-          className="w-full h-12 bg-accent text-accent-foreground uppercase text-[11px] font-medium flex items-center justify-center gap-2 transition-all hover:opacity-90 disabled:opacity-50"
-          style={{ borderRadius: 'var(--radius)', letterSpacing: '0.15em' }}
-        >
-          <CreditCard className="w-4 h-4" />
-          Buy it now
-        </button>
+        <motion.div whileTap={{ scale: 0.98 }}>
+          <Link
+            to={`/contact?product=${encodeURIComponent(product.handle)}`}
+            className="btn-primary w-full h-14 text-[12px] flex items-center justify-center gap-2"
+          >
+            <Mail className="w-4 h-4" />
+            Contact to buy — ${price.toFixed(2)}
+          </Link>
+        </motion.div>
       </div>
 
       {/* Trust Badges */}
@@ -148,7 +91,7 @@ const ProductInfo = ({ product, selectedOptions, setSelectedOptions, selectedVar
         </div>
         <div className="flex flex-col items-center gap-2 text-center">
           <Shield className="w-5 h-5 text-muted-foreground" strokeWidth={1.5} />
-          <span className="text-[10px] caps-label text-muted-foreground">Secure Checkout</span>
+          <span className="text-[10px] caps-label text-muted-foreground">Quality Guaranteed</span>
         </div>
       </div>
 

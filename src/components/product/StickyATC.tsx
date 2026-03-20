@@ -1,17 +1,15 @@
-import { Loader2 } from 'lucide-react';
-import { useCartStore } from '@/stores/cartStore';
+import { Mail } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface StickyATCProps {
   visible: boolean;
   product: any;
   selectedVariant: any;
-  onAddToCart: () => void;
   imageUrl?: string;
 }
 
-const StickyATC = ({ visible, product, selectedVariant, onAddToCart, imageUrl }: StickyATCProps) => {
-  const cartLoading = useCartStore(s => s.isLoading);
+const StickyATC = ({ visible, product, selectedVariant, imageUrl }: StickyATCProps) => {
   const price = parseFloat(selectedVariant?.price.amount || '0');
 
   return (
@@ -36,13 +34,13 @@ const StickyATC = ({ visible, product, selectedVariant, onAddToCart, imageUrl }:
                 <p className="text-xs text-muted-foreground price-display">${price.toFixed(2)}</p>
               </div>
             </div>
-            <button
-              onClick={onAddToCart}
-              disabled={cartLoading}
-              className="btn-primary flex-shrink-0 h-10 px-6 text-[10px]"
+            <Link
+              to={`/contact?product=${encodeURIComponent(product.handle)}`}
+              className="btn-primary flex-shrink-0 h-10 px-6 text-[10px] flex items-center gap-2"
             >
-              {cartLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Add to cart'}
-            </button>
+              <Mail className="w-3 h-3" />
+              Enquire now
+            </Link>
           </div>
         </motion.div>
       )}

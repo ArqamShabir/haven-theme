@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Search, User, Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import CartDrawer from './CartDrawer';
 import SearchOverlay from './SearchOverlay';
-import { useCartStore } from '@/stores/cartStore';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const totalItems = useCartStore(s => s.items.reduce((sum, i) => sum + i.quantity, 0));
+  const storeName = useSettingsStore(s => s.storeName);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -52,7 +51,7 @@ const Header = () => {
           </button>
 
           <Link to="/" className="absolute left-1/2 -translate-x-1/2">
-            <h1 className="font-serif text-2xl tracking-tight">Haven</h1>
+            <h1 className="font-serif text-2xl tracking-tight">{storeName}</h1>
           </Link>
 
           <div className="flex items-center gap-4">
@@ -66,7 +65,6 @@ const Header = () => {
             <Link to="/about" className="p-2 hover:opacity-70 transition-opacity duration-150 hidden md:block" aria-label="Account">
               <User className="w-5 h-5" />
             </Link>
-            <CartDrawer />
           </div>
         </div>
       </header>
