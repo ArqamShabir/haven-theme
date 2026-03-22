@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProductStore, Product } from '@/stores/productStore';
-import { ArrowLeft, Plus, X } from 'lucide-react';
+import { ArrowLeft, Plus, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 
 const emptyProduct = {
@@ -11,6 +11,8 @@ const emptyProduct = {
   currencyCode: 'USD',
   imageUrls: [''],
   options: [] as Array<{ name: string; values: string[] }>,
+  variantPrices: {} as Record<string, string>, // variant title -> price override
+  variantAvailability: {} as Record<string, boolean>, // variant title -> available
 };
 
 const AdminProductForm = () => {
@@ -22,11 +24,18 @@ const AdminProductForm = () => {
   const isEditing = id && id !== 'new';
 
   const [form, setForm] = useState(emptyProduct);
+  const [showVariants, setShowVariants] = useState(false);
 
   useEffect(() => {
     if (isEditing) {
       const existing = products.find(p => p.id === id);
       if (existing) {
+        const vPrices: Record<string, string> = {};
+        const vAvail: Record<string, boolean> = {};
+        existing.variants.edges.forEach(({ node: v }) => {
+          vPrices[v.title] = v.price.amount;
+          vAvail[v.title] = v.availableForSale;
+        });
         setForm({
           title: existing.title,
           description: existing.description,
@@ -34,10 +43,32 @@ const AdminProductForm = () => {
           currencyCode: existing.priceRange.minVariantPrice.currencyCode,
           imageUrls: existing.images.edges.map(e => e.node.url).concat(['']),
           options: existing.options.filter(o => !(o.name === 'Title' && o.values.length === 1 && o.values[0] === 'Default Title')),
+          variantPrices: vPrices,
+          variantAvailability: vAvail,
         });
+        if (existing.options.some(o => o.name !== 'Title')) setShowVariants(true);
       }
     }
   }, [id, isEditing, products]);
+
+  // Generate variant combinations from options
+  const getVariantCombos = (): Array<{ title: string; options: Array<{ name: string; value: string }> }> => {
+    const opts = form.options.filter(o => o.name.trim() && o.values.length > 0);
+    if (opts.length === 0) return [];
+    const combos: Array<Array<{ name: string; value: string }>> = [];
+    const combine = (idx: number, current: Array<{ name: string; value: string }>) => {
+      if (idx === opts.length) { combos.push([...current]); return; }
+      for (const v of opts[idx].values) {
+        current.push({ name: opts[idx].name, value: v });
+        combine(idx + 1, current);
+        current.pop();
+      }
+    };
+    combine(0, []);
+    return combos.map(c => ({ title: c.map(x => x.value).join(' / '), options: c }));
+  };
+
+  const variantCombos = getVariantCombos();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,44 +85,31 @@ const AdminProductForm = () => {
       ? form.options.filter(o => o.name.trim() && o.values.length > 0)
       : [{ name: 'Title', values: ['Default Title'] }];
 
-    // Generate variants from options
-    const generateVariants = (opts: typeof options): Array<{ id: string; title: string; selectedOptions: Array<{ name: string; value: string }> }> => {
-      if (opts.length === 0 || (opts.length === 1 && opts[0].name === 'Title')) {
-        return [{ id: `v-${Date.now()}`, title: 'Default Title', selectedOptions: [{ name: 'Title', value: 'Default Title' }] }];
-      }
-      const combinations: Array<Array<{ name: string; value: string }>> = [];
-      const combine = (index: number, current: Array<{ name: string; value: string }>) => {
-        if (index === opts.length) { combinations.push([...current]); return; }
-        for (const value of opts[index].values) {
-          current.push({ name: opts[index].name, value });
-          combine(index + 1, current);
-          current.pop();
-        }
-      };
-      combine(0, []);
-      return combinations.map((combo, i) => ({
-        id: `v-${Date.now()}-${i}`,
-        title: combo.map(c => c.value).join(' / '),
-        selectedOptions: combo,
-      }));
-    };
-
-    const variants = generateVariants(options);
+    const variants = variantCombos.length > 0
+      ? variantCombos.map((combo, i) => ({
+          id: `v-${Date.now()}-${i}`,
+          title: combo.title,
+          selectedOptions: combo.options,
+          price: {
+            amount: parseFloat(form.variantPrices[combo.title] || form.price).toFixed(2),
+            currencyCode: form.currencyCode,
+          },
+          availableForSale: form.variantAvailability[combo.title] !== false,
+        }))
+      : [{
+          id: `v-${Date.now()}`,
+          title: 'Default Title',
+          selectedOptions: [{ name: 'Title', value: 'Default Title' }],
+          price: { amount: parseFloat(form.price).toFixed(2), currencyCode: form.currencyCode },
+          availableForSale: true,
+        }];
 
     const productData: Omit<Product, 'id' | 'handle'> = {
       title: form.title.trim(),
       description: form.description.trim(),
       priceRange: { minVariantPrice: { amount: parseFloat(form.price).toFixed(2), currencyCode: form.currencyCode } },
-      images: { edges: imageEdges.length > 0 ? imageEdges : [] },
-      variants: {
-        edges: variants.map(v => ({
-          node: {
-            ...v,
-            price: { amount: parseFloat(form.price).toFixed(2), currencyCode: form.currencyCode },
-            availableForSale: true,
-          },
-        })),
-      },
+      images: { edges: imageEdges },
+      variants: { edges: variants.map(v => ({ node: v })) },
       options,
     };
 
@@ -108,7 +126,6 @@ const AdminProductForm = () => {
   const updateImageUrl = (index: number, value: string) => {
     const urls = [...form.imageUrls];
     urls[index] = value;
-    // Auto-add new empty slot
     if (index === urls.length - 1 && value.trim()) urls.push('');
     setForm(f => ({ ...f, imageUrls: urls }));
   };
@@ -119,6 +136,7 @@ const AdminProductForm = () => {
 
   const addOption = () => {
     setForm(f => ({ ...f, options: [...f.options, { name: '', values: [] }] }));
+    setShowVariants(true);
   };
 
   const updateOptionName = (index: number, name: string) => {
@@ -160,7 +178,7 @@ const AdminProductForm = () => {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="caps-label text-foreground mb-2 block text-[10px]">Price *</label>
+            <label className="caps-label text-foreground mb-2 block text-[10px]">Base Price *</label>
             <input type="number" step="0.01" min="0" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} className={inputClass} style={{ borderRadius: 'var(--radius)' }} required />
           </div>
           <div>
@@ -184,6 +202,14 @@ const AdminProductForm = () => {
               </div>
             ))}
           </div>
+          {/* Image previews */}
+          {form.imageUrls.filter(u => u.trim()).length > 0 && (
+            <div className="flex gap-2 mt-3 flex-wrap">
+              {form.imageUrls.filter(u => u.trim()).map((url, i) => (
+                <img key={i} src={url} alt="" className="w-16 h-16 object-cover border border-border" style={{ borderRadius: 'var(--radius)' }} onError={e => (e.currentTarget.style.display = 'none')} />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Options */}
@@ -204,6 +230,52 @@ const AdminProductForm = () => {
             </div>
           ))}
         </div>
+
+        {/* Variant Price & Availability Management */}
+        {variantCombos.length > 0 && (
+          <div className="border border-border" style={{ borderRadius: 'var(--radius)' }}>
+            <button
+              type="button"
+              onClick={() => setShowVariants(!showVariants)}
+              className="w-full flex items-center justify-between p-4 text-sm font-medium text-foreground hover:bg-secondary/50 transition-colors"
+            >
+              <span>Variants ({variantCombos.length})</span>
+              {showVariants ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+            {showVariants && (
+              <div className="border-t border-border">
+                {/* Header */}
+                <div className="grid grid-cols-[1fr_120px_80px] gap-3 px-4 py-2 bg-secondary/30">
+                  <span className="text-[10px] caps-label text-muted-foreground">Variant</span>
+                  <span className="text-[10px] caps-label text-muted-foreground">Price</span>
+                  <span className="text-[10px] caps-label text-muted-foreground">Available</span>
+                </div>
+                {variantCombos.map((combo) => (
+                  <div key={combo.title} className="grid grid-cols-[1fr_120px_80px] gap-3 px-4 py-2 border-t border-border items-center">
+                    <span className="text-sm text-foreground">{combo.title}</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={form.variantPrices[combo.title] || form.price}
+                      onChange={e => setForm(f => ({ ...f, variantPrices: { ...f.variantPrices, [combo.title]: e.target.value } }))}
+                      className="h-9 px-3 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-foreground transition-colors"
+                      style={{ borderRadius: 'var(--radius)' }}
+                    />
+                    <label className="flex items-center justify-center">
+                      <input
+                        type="checkbox"
+                        checked={form.variantAvailability[combo.title] !== false}
+                        onChange={e => setForm(f => ({ ...f, variantAvailability: { ...f.variantAvailability, [combo.title]: e.target.checked } }))}
+                        className="w-4 h-4 accent-foreground"
+                      />
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="flex gap-3 pt-4">
           <button type="submit" className="btn-primary">{isEditing ? 'Save changes' : 'Create product'}</button>
