@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, Settings, LogOut, Lock } from 'lucide-react';
+import { LayoutDashboard, Package, Settings, LogOut, Lock, Palette, MessageSquare } from 'lucide-react';
 import { useSettingsStore } from '@/stores/settingsStore';
 
 const AdminLayout = () => {
@@ -49,12 +49,12 @@ const AdminLayout = () => {
   const navItems = [
     { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { label: 'Products', href: '/admin/products', icon: Package },
+    { label: 'Appearance', href: '/admin/appearance', icon: Palette },
     { label: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
       <aside className="w-60 border-r border-border bg-card flex flex-col flex-shrink-0">
         <div className="p-6 border-b border-border">
           <Link to="/" className="font-serif text-xl text-foreground">{storeName}</Link>
@@ -62,15 +62,13 @@ const AdminLayout = () => {
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {navItems.map(item => {
-            const isActive = location.pathname === item.href;
+            const isActive = location.pathname === item.href || (item.href !== '/admin' && location.pathname.startsWith(item.href));
             return (
               <Link
                 key={item.href}
                 to={item.href}
                 className={`flex items-center gap-3 px-3 py-2.5 text-sm transition-colors ${
-                  isActive
-                    ? 'bg-secondary text-foreground font-medium'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                  isActive ? 'bg-secondary text-foreground font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
                 }`}
                 style={{ borderRadius: 'var(--radius)' }}
               >
@@ -81,17 +79,12 @@ const AdminLayout = () => {
           })}
         </nav>
         <div className="p-3 border-t border-border">
-          <Link
-            to="/"
-            className="flex items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
+          <Link to="/" className="flex items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <LogOut className="w-4 h-4" />
             Back to site
           </Link>
         </div>
       </aside>
-
-      {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">
         <Outlet />
       </main>

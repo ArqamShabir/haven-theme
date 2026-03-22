@@ -18,6 +18,7 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
 const AdminProductForm = lazy(() => import('./pages/admin/AdminProductForm'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const AdminAppearance = lazy(() => import('./pages/admin/AdminAppearance'));
 
 const App = () => (
   <TooltipProvider>
@@ -39,6 +40,7 @@ const App = () => (
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="products/:id" element={<AdminProductForm />} />
+            <Route path="appearance" element={<AdminAppearance />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
 
