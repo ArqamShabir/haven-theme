@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { useSettingsStore, HeroSlide, SocialLink, Testimonial } from '@/stores/settingsStore';
 import { Plus, X, Download, Upload, Star } from 'lucide-react';
 import { toast } from 'sonner';
-import { useProductStore } from '@/stores/productStore';
+import { useSettingsStore, HeroSlide, SocialLink, Testimonial, SiteSettings } from '@/stores/settingsStore';
+import { useProductStore, Product } from '@/stores/productStore';
+import { saveSiteDataToProjectFile } from '@/lib/siteDataPersistence';
 
 const AdminSettings = () => {
   const settings = useSettingsStore();
-  const productStore = useProductStore();
+  const products = useProductStore(s => s.products);
+  const replaceSettings = useSettingsStore(s => s.replaceSettings);
+  const replaceProducts = useProductStore(s => s.replaceProducts);
   const [activeTab, setActiveTab] = useState<'general' | 'hero' | 'social' | 'testimonials' | 'data'>('general');
 
   const [form, setForm] = useState({
@@ -25,55 +28,121 @@ const AdminSettings = () => {
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(settings.socialLinks);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(settings.testimonials);
 
+  const saveProjectFile = async (nextSettings: SiteSettings, nextProducts: Product[] = products) => {
+    try {
+      await saveSiteDataToProjectFile({ settings: nextSettings, products: nextProducts });
+      toast.success('Saved to src/data/site-data.json');
+    } catch {
+      toast.error('Saved in browser, but could not update src/data/site-data.json');
+    }
+  };
+
   const handleSaveGeneral = (e: React.FormEvent) => {
     e.preventDefault();
+    const nextSettings = {
+      ...JSON.parse(settings.exportData()),
+      ...form,
+    } as SiteSettings;
     settings.updateSettings(form);
+    void saveProjectFile(nextSettings);
     toast.success('General settings saved');
   };
 
   const handleSaveHero = () => {
-    settings.updateSettings({ heroSlides: heroSlides.filter(s => s.title.trim()) });
+    const nextSettings = {
+      ...JSON.parse(settings.exportData()),
+      heroSlides: heroSlides.filter(s => s.title.trim()),
+    } as SiteSettings;
+    settings.updateSettings({ heroSlides: nextSettings.heroSlides });
+    void saveProjectFile(nextSettings);
     toast.success('Hero slides saved');
   };
 
   const handleSaveSocial = () => {
-    settings.updateSettings({ socialLinks: socialLinks.filter(l => l.platform.trim()) });
+    const nextSettings = {
+      ...JSON.parse(settings.exportData()),
+      socialLinks: socialLinks.filter(l => l.platform.trim()),
+    } as SiteSettings;
+    settings.updateSettings({ socialLinks: nextSettings.socialLinks });
+    void saveProjectFile(nextSettings);
     toast.success('Social links saved');
   };
 
   const handleSaveTestimonials = () => {
-    settings.updateSettings({ testimonials: testimonials.filter(t => t.name.trim()) });
+    const nextSettings = {
+      ...JSON.parse(settings.exportData()),
+      testimonials: testimonials.filter(t => t.name.trim()),
+    } as SiteSettings;
+    settings.updateSettings({ testimonials: nextSettings.testimonials });
+    void saveProjectFile(nextSettings);
     toast.success('Testimonials saved');
   };
 
   const handleExport = () => {
-    const data = {
+    const blob = new Blob([JSON.stringify({
       settings: JSON.parse(settings.exportData()),
-      products: productStore.products,
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      products,
+    }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'site-data.json';
-    a.click();
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'site-data.json';
+    link.click();
     URL.revokeObjectURL(url);
-    toast.success('Data exported — place this in public/site-data.json for static builds');
+    toast.success('Data downloaded as site-data.json.');
+  };
+
+  const handleSaveBuildData = async () => {
+    try {
+      const savePicker = (window as Window & {
+        showSaveFilePicker?: (options?: {
+          suggestedName?: string;
+          types?: Array<{ description?: string; accept: Record<string, string[]> }>;
+        }) => Promise<{
+          createWritable: () => Promise<{ write: (contents: string) => Promise<void>; close: () => Promise<void> }>;
+        }>;
+      }).showSaveFilePicker;
+
+      if (!savePicker) {
+        handleExport();
+        toast.info('Your browser does not support direct file saving. The JSON was downloaded instead.');
+        return;
+      }
+
+      const fileHandle = await savePicker({
+        suggestedName: 'site-data.json',
+        types: [
+          {
+            description: 'JSON Files',
+            accept: { 'application/json': ['.json'] },
+          },
+        ],
+      });
+
+      const writable = await fileHandle.createWritable();
+      await writable.write(JSON.stringify({
+        settings: JSON.parse(settings.exportData()),
+        products,
+      }, null, 2));
+      await writable.close();
+      toast.success('Build data saved. Use this file as src/data/site-data.json, then run npm run build.');
+    } catch {
+      toast.error('Build data was not saved');
+    }
   };
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
         const data = JSON.parse(ev.target?.result as string);
-        if (data.settings) settings.updateSettings(data.settings);
-        if (data.products) {
-          // Clear and re-add all products
-          data.products.forEach((p: any) => {
-            productStore.updateProduct(p.id, p);
-          });
+        if (data.settings) replaceSettings(data.settings as SiteSettings);
+        if (data.products) replaceProducts(data.products as Product[]);
+        if (data.settings && data.products) {
+          void saveProjectFile(data.settings as SiteSettings, data.products as Product[]);
         }
         toast.success('Data imported successfully');
       } catch {
@@ -83,7 +152,7 @@ const AdminSettings = () => {
     reader.readAsText(file);
   };
 
-  const inputClass = "w-full h-12 px-4 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-foreground transition-colors";
+  const inputClass = 'w-full h-12 px-4 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-foreground transition-colors';
   const tabClass = (tab: string) =>
     `px-4 py-2 text-sm transition-colors ${activeTab === tab ? 'text-foreground border-b-2 border-foreground font-medium' : 'text-muted-foreground hover:text-foreground'}`;
 
@@ -91,7 +160,6 @@ const AdminSettings = () => {
     <div className="max-w-3xl">
       <h1 className="heading-l2 text-foreground mb-6">Settings</h1>
 
-      {/* Tabs */}
       <div className="flex gap-1 border-b border-border mb-8">
         {(['general', 'hero', 'social', 'testimonials', 'data'] as const).map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)} className={tabClass(tab)}>
@@ -100,7 +168,6 @@ const AdminSettings = () => {
         ))}
       </div>
 
-      {/* General Tab */}
       {activeTab === 'general' && (
         <form onSubmit={handleSaveGeneral} className="space-y-6">
           <div>
@@ -146,7 +213,6 @@ const AdminSettings = () => {
         </form>
       )}
 
-      {/* Hero Slides Tab */}
       {activeTab === 'hero' && (
         <div className="space-y-6">
           {heroSlides.map((slide, i) => (
@@ -174,7 +240,6 @@ const AdminSettings = () => {
         </div>
       )}
 
-      {/* Social Links Tab */}
       {activeTab === 'social' && (
         <div className="space-y-4">
           {socialLinks.map((link, i) => (
@@ -191,7 +256,6 @@ const AdminSettings = () => {
         </div>
       )}
 
-      {/* Testimonials Tab */}
       {activeTab === 'testimonials' && (
         <div className="space-y-6">
           {testimonials.map((t, i) => (
@@ -223,23 +287,27 @@ const AdminSettings = () => {
         </div>
       )}
 
-      {/* Data Export/Import Tab */}
       {activeTab === 'data' && (
         <div className="space-y-6">
           <div className="p-6 border border-border bg-card" style={{ borderRadius: 'var(--radius)' }}>
             <h3 className="text-sm font-medium text-foreground mb-2">Export Site Data</h3>
             <p className="text-xs text-muted-foreground mb-4">
-              Download all products and settings as JSON. After editing locally, run <code className="bg-secondary px-1 py-0.5">npm run build</code> and deploy the <code className="bg-secondary px-1 py-0.5">dist/</code> folder as a static site.
+              Save your current admin products and settings into the JSON file that the build uses. The easiest path is to save directly over <code className="bg-secondary px-1 py-0.5">src/data/site-data.json</code>, then run <code className="bg-secondary px-1 py-0.5">npm run build</code>.
             </p>
-            <button onClick={handleExport} className="btn-primary flex items-center gap-2">
-              <Download className="w-4 h-4" /> Export data
-            </button>
+            <div className="flex flex-wrap gap-3">
+              <button onClick={handleSaveBuildData} className="btn-primary flex items-center gap-2">
+                <Download className="w-4 h-4" /> Save build data
+              </button>
+              <button onClick={handleExport} className="btn-secondary flex items-center gap-2" type="button">
+                <Download className="w-4 h-4" /> Download copy
+              </button>
+            </div>
           </div>
 
           <div className="p-6 border border-border bg-card" style={{ borderRadius: 'var(--radius)' }}>
             <h3 className="text-sm font-medium text-foreground mb-2">Import Site Data</h3>
             <p className="text-xs text-muted-foreground mb-4">
-              Import a previously exported JSON file to restore products and settings.
+              Import a previously exported JSON file to restore products and settings into your local admin panel.
             </p>
             <label className="btn-secondary inline-flex items-center gap-2 cursor-pointer">
               <Upload className="w-4 h-4" /> Import data
@@ -252,8 +320,8 @@ const AdminSettings = () => {
             <ol className="text-xs text-muted-foreground space-y-2 list-decimal list-inside">
               <li>Run the site locally with <code className="bg-secondary px-1 py-0.5">npm run dev</code></li>
               <li>Go to <code className="bg-secondary px-1 py-0.5">/admin</code> and edit products, settings, hero, testimonials</li>
-              <li>Click <strong>Export data</strong> above to download your changes</li>
-              <li>Run <code className="bg-secondary px-1 py-0.5">npm run build</code> — the build uses your localStorage data as defaults</li>
+              <li>Click <strong>Save build data</strong> and choose <code className="bg-secondary px-1 py-0.5">src/data/site-data.json</code></li>
+              <li>Run <code className="bg-secondary px-1 py-0.5">npm run build</code> so the build includes that data</li>
               <li>Upload the <code className="bg-secondary px-1 py-0.5">dist/</code> folder to any static host (Netlify, Vercel, etc.)</li>
             </ol>
           </div>

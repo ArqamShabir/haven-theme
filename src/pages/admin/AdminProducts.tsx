@@ -1,15 +1,26 @@
 import { Link } from 'react-router-dom';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { useProductStore } from '@/stores/productStore';
+import { useSettingsStore } from '@/stores/settingsStore';
+import { saveSiteDataToProjectFile } from '@/lib/siteDataPersistence';
 import { toast } from 'sonner';
 
 const AdminProducts = () => {
   const products = useProductStore(s => s.products);
   const deleteProduct = useProductStore(s => s.deleteProduct);
+  const exportSettings = useSettingsStore(s => s.exportData);
 
-  const handleDelete = (id: string, title: string) => {
+  const handleDelete = async (id: string, title: string) => {
     if (window.confirm(`Delete "${title}"? This cannot be undone.`)) {
       deleteProduct(id);
+      try {
+        await saveSiteDataToProjectFile({
+          settings: JSON.parse(exportSettings()),
+          products: useProductStore.getState().products,
+        });
+      } catch {
+        toast.error('Deleted in browser, but could not update src/data/site-data.json');
+      }
       toast.success(`"${title}" deleted`);
     }
   };

@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 
 const ProductPage = lazy(() => import('./pages/ProductPage'));
@@ -24,6 +25,7 @@ const App = () => (
   <TooltipProvider>
     <Sonner position="top-center" />
     <BrowserRouter>
+      <ScrollToTop />
       <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><div className="w-5 h-5 border-2 border-foreground/20 border-t-foreground animate-spin rounded-full" /></div>}>
         <Routes>
           <Route path="/" element={<Index />} />

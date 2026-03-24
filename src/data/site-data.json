@@ -1,0 +1,376 @@
+{
+  "settings": {
+    "storeName": "Haven",
+    "storeTagline": "Essential forms for the modern home.",
+    "announcementText": "Complimentary shipping on all orders over $150",
+    "contactEmail": "hello@haven-home.com",
+    "contactPhone": "",
+    "studioAddress": "123 Artisan Lane, Portland, OR 97201",
+    "heroSlides": [
+      {
+        "image": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&q=80",
+        "subtitle": "New Collection",
+        "title": "Essential forms for the modern home",
+        "description": "Thoughtfully designed objects that bring clarity and calm to everyday living.",
+        "cta": "Shop the collection",
+        "link": "/collections"
+      },
+      {
+        "image": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80",
+        "subtitle": "Artisan Series",
+        "title": "Handcrafted ceramic pieces",
+        "description": "Each piece is individually wheel-thrown by skilled artisans - no two are alike.",
+        "cta": "Explore now",
+        "link": "/collections"
+      }
+    ],
+    "socialLinks": [
+      {
+        "platform": "Instagram",
+        "url": "#"
+      },
+      {
+        "platform": "Pinterest",
+        "url": "#"
+      },
+      {
+        "platform": "Twitter",
+        "url": "#"
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Sarah M.",
+        "rating": 5,
+        "text": "Absolutely stunning. The matte finish catches the light beautifully. Worth every penny.",
+        "date": "2 weeks ago"
+      },
+      {
+        "name": "James K.",
+        "rating": 5,
+        "text": "Bought the large in Charcoal - it's the perfect centerpiece for our dining table.",
+        "date": "1 month ago"
+      },
+      {
+        "name": "Elena R.",
+        "rating": 5,
+        "text": "The craftsmanship is incredible. You can feel the quality the moment you hold it.",
+        "date": "3 weeks ago"
+      }
+    ],
+    "footerTagline": "Essential forms for the modern home.",
+    "whatsappNumber": "",
+    "adminPassword": "admin123"
+  },
+  "products": [
+    {
+      "id": "product-artisan-ceramic-vase",
+      "title": "Artisan Ceramic Vase",
+      "description": "Handcrafted with care, each piece tells a unique story. This artisan ceramic vase is wheel-thrown by skilled craftspeople using traditional techniques passed down through generations.",
+      "handle": "artisan-ceramic-vase",
+      "priceRange": {
+        "minVariantPrice": {
+          "amount": "89.00",
+          "currencyCode": "USD"
+        }
+      },
+      "images": {
+        "edges": [
+          {
+            "node": {
+              "url": "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?w=800&q=80",
+              "altText": "Artisan Ceramic Vase"
+            }
+          },
+          {
+            "node": {
+              "url": "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80",
+              "altText": "Artisan Ceramic Vase"
+            }
+          },
+          {
+            "node": {
+              "url": "/uploads/1774268857210-9shg83-windows-11-8k-stock-8192x5120-17012.jpg",
+              "altText": "Artisan Ceramic Vase"
+            }
+          }
+        ]
+      },
+      "variants": {
+        "edges": [
+          {
+            "node": {
+              "id": "v-1774268885798-0",
+              "title": "Natural / Small",
+              "selectedOptions": [
+                {
+                  "name": "Color",
+                  "value": "Natural"
+                },
+                {
+                  "name": "Size",
+                  "value": "Small"
+                }
+              ],
+              "price": {
+                "amount": "79.00",
+                "currencyCode": "USD"
+              },
+              "availableForSale": false
+            }
+          },
+          {
+            "node": {
+              "id": "v-1774268885798-1",
+              "title": "Natural / Large",
+              "selectedOptions": [
+                {
+                  "name": "Color",
+                  "value": "Natural"
+                },
+                {
+                  "name": "Size",
+                  "value": "Large"
+                }
+              ],
+              "price": {
+                "amount": "129.00",
+                "currencyCode": "USD"
+              },
+              "availableForSale": true
+            }
+          },
+          {
+            "node": {
+              "id": "v-1774268885798-2",
+              "title": "Charcoal / Small",
+              "selectedOptions": [
+                {
+                  "name": "Color",
+                  "value": "Charcoal"
+                },
+                {
+                  "name": "Size",
+                  "value": "Small"
+                }
+              ],
+              "price": {
+                "amount": "99.00",
+                "currencyCode": "USD"
+              },
+              "availableForSale": true
+            }
+          },
+          {
+            "node": {
+              "id": "v-1774268885798-3",
+              "title": "Charcoal / Large",
+              "selectedOptions": [
+                {
+                  "name": "Color",
+                  "value": "Charcoal"
+                },
+                {
+                  "name": "Size",
+                  "value": "Large"
+                }
+              ],
+              "price": {
+                "amount": "129.00",
+                "currencyCode": "USD"
+              },
+              "availableForSale": true
+            }
+          }
+        ]
+      },
+      "options": [
+        {
+          "name": "Color",
+          "values": [
+            "Natural",
+            "Charcoal"
+          ]
+        },
+        {
+          "name": "Size",
+          "values": [
+            "Small",
+            "Large"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "product-linen-throw",
+      "title": "Linen Throw Blanket",
+      "description": "Luxuriously soft linen throw blanket, perfect for adding warmth and texture to any space. Stonewashed for an effortlessly lived-in feel.",
+      "handle": "linen-throw-blanket",
+      "priceRange": {
+        "minVariantPrice": {
+          "amount": "145.00",
+          "currencyCode": "USD"
+        }
+      },
+      "images": {
+        "edges": [
+          {
+            "node": {
+              "url": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80",
+              "altText": "Linen Throw Blanket"
+            }
+          }
+        ]
+      },
+      "variants": {
+        "edges": [
+          {
+            "node": {
+              "id": "v-5",
+              "title": "Oatmeal",
+              "price": {
+                "amount": "145.00",
+                "currencyCode": "USD"
+              },
+              "availableForSale": true,
+              "selectedOptions": [
+                {
+                  "name": "Color",
+                  "value": "Oatmeal"
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "id": "v-6",
+              "title": "Sage",
+              "price": {
+                "amount": "145.00",
+                "currencyCode": "USD"
+              },
+              "availableForSale": true,
+              "selectedOptions": [
+                {
+                  "name": "Color",
+                  "value": "Sage"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "options": [
+        {
+          "name": "Color",
+          "values": [
+            "Oatmeal",
+            "Sage"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "product-wooden-tray",
+      "title": "Wooden Serving Tray",
+      "description": "Hand-carved from sustainably sourced walnut wood. Each tray showcases the natural grain patterns unique to its piece of timber.",
+      "handle": "wooden-serving-tray",
+      "priceRange": {
+        "minVariantPrice": {
+          "amount": "65.00",
+          "currencyCode": "USD"
+        }
+      },
+      "images": {
+        "edges": [
+          {
+            "node": {
+              "url": "https://images.unsplash.com/photo-1544457070-4cd773b4d71e?w=800&q=80",
+              "altText": "Wooden Serving Tray"
+            }
+          }
+        ]
+      },
+      "variants": {
+        "edges": [
+          {
+            "node": {
+              "id": "v-7",
+              "title": "Default Title",
+              "price": {
+                "amount": "65.00",
+                "currencyCode": "USD"
+              },
+              "availableForSale": true,
+              "selectedOptions": [
+                {
+                  "name": "Title",
+                  "value": "Default Title"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "options": [
+        {
+          "name": "Title",
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "product-scented-candle",
+      "title": "Scented Candle Set",
+      "description": "Hand-poured soy wax candles with essential oil blends. Set of three in ceramic vessels - cedar, lavender, and bergamot.",
+      "handle": "scented-candle-set",
+      "priceRange": {
+        "minVariantPrice": {
+          "amount": "48.00",
+          "currencyCode": "USD"
+        }
+      },
+      "images": {
+        "edges": [
+          {
+            "node": {
+              "url": "https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=800&q=80",
+              "altText": "Scented Candle Set"
+            }
+          }
+        ]
+      },
+      "variants": {
+        "edges": [
+          {
+            "node": {
+              "id": "v-8",
+              "title": "Default Title",
+              "price": {
+                "amount": "48.00",
+                "currencyCode": "USD"
+              },
+              "availableForSale": true,
+              "selectedOptions": [
+                {
+                  "name": "Title",
+                  "value": "Default Title"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "options": [
+        {
+          "name": "Title",
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -62,7 +62,7 @@ const Header = () => {
             >
               <Search className="w-5 h-5" />
             </button>
-            <Link to="/about" className="p-2 hover:opacity-70 transition-opacity duration-150 hidden md:block" aria-label="Account">
+            <Link to="/about" className="p-2 hover:opacity-70 transition-opacity duration-150 hidden" aria-label="Account">
               <User className="w-5 h-5" />
             </Link>
           </div>
